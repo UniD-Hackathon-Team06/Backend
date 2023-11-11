@@ -1,5 +1,12 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
+
+from mysql import models, schema, connect, user_crud
+
+conn = connect.engineconn()
+
+connect.Base.metadata.create_all(bind=conn.engine)
 
 app = FastAPI()
 
@@ -58,7 +65,12 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-
+@app.post("/users/", response_model=schema.User)
+def create_user(user: schema.UserCreate, db: Session = Depends(conn.getDB)):
+    db_user = user_crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return user_crud.create_user(db=db, user=user)
 
 @app.get("/")
 async def root():
