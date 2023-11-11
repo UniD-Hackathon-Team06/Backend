@@ -125,6 +125,42 @@ def set_message(template_id: str, db: Session = Depends(conn.getDB)):
         raise HTTPException(status_code=404, detail="Message not found")
     return message_content
 
+@app.post("/reply")
+def reply_message(reply: schema.Reply, current_token: str = Depends(get_current_token), db: Session = Depends(conn.getDB)):
+    try:
+        name = current_token.split("_")[2]
+        db_user = user_crud.get_user_by_name(db, name=name)
+        if db_user:
+            db_user.reply = True
+            db.commit()
+            db.refresh(db_user)
+            return {"result": "success"}
+        else:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+    except:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+@app.get("/alert")
+def alert_no_reply(db: Session = Depends(conn.getDB)):
+    db_users = user_crud.get_users(db)
+    no_reply_users = []
+    for user in db_users:
+        print(user)
+        if user.reply == False:
+            no_reply_users.append(user)
+        user.reply = False
+
+    template = msg_crud.get_active_message_template(db)
+    if template is None:
+        return {"result": "no sending message"}
+    template.activate = False
+
+    db.commit()
+    for user in no_reply_users:
+        db.refresh(user)
+
+    return no_reply_users
+
 #base test
 @app.get("/")
 async def root():

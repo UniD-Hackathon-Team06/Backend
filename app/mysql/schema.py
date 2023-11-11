@@ -60,3 +60,6 @@ class MessageTemplate(MessageTemplateBase):
 
     class Config:
         orm_mode = True
+
+class Reply(BaseModel):
+    message: str
