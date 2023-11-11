@@ -2,7 +2,8 @@ FROM ubuntu:22.04
 
 # Install basic
 RUN apt-get update -y && \
-    apt-get install -y
+    apt-get install -y \
+    software-properties-common
 
 # Install Python 3.10
 RUN add-apt-repository ppa:deadsnakes/ppa -y && \
