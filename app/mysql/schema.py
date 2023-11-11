@@ -16,13 +16,14 @@ from pydantic import BaseModel
 
 class DangerBase(BaseModel):
     image: str
+    time: str
+    user_id: int
 
 class DangerCreate(DangerBase):
     pass
 
 class Danger(DangerBase):
     id: int
-    user_id: int
 
     class Config:
         orm_mode = True
@@ -52,6 +53,7 @@ class MessageCreate(MessageBase):
 
 class Message(MessageBase):
     id: int
+    activate: bool
 
     class Config:
         orm_mode = True

@@ -35,6 +35,7 @@ class Message(connect.Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     message = Column(String(128))
+    activate = Column(Boolean, default=False)
 
 class Danger(connect.Base):
     __tablename__ = "danger"
@@ -42,5 +43,6 @@ class Danger(connect.Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     image = Column(Text)
     user_id = Column(Integer, ForeignKey("user.id"))
+    time = Column(String(128))
 
     user = relationship("User", back_populates="dangers")
