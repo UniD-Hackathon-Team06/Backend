@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 
-from mysql import models, schema, connect, user_crud
+from mysql import models, schema, connect, user_crud, danger_crud
 
 conn = connect.engineconn()
 
@@ -83,15 +83,15 @@ def get_users(db: Session = Depends(conn.getDB)):
 def create_user(user: schema.UserCreate, db: Session = Depends(conn.getDB)):
     db_user = user_crud.get_user_by_name(db, name=user.name)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="user already registered")
     return user_crud.create_user(db=db, user=user)
 
-@app.post("/danger/user_id", response_model= schema.DangerBase)
-def alert_danger(danger: schema.Danger, db: Session = Depends(conn.getDB)):
-    db_danger = user_crud.get_danger_by_id(db, id=danger.user_id)
-    return user_crud.alert_danger(db=db, danger=danger)
-
-
+@app.post("/danger", response_model= schema.DangerBase)
+def alert_danger(danger: schema.DangerCreate, db: Session = Depends(conn.getDB)):
+    db_danger = danger_crud.get_danger_by_id(db, id=danger.user_id)
+    if db_danger:
+        raise HTTPException(status_code=400, detail="danger already registered")
+    return danger_crud.create_danger(db=db, danger=danger)
 
 @app.post("/login")
 def login(user: schema.UserLogin, db: Session = Depends(conn.getDB)):

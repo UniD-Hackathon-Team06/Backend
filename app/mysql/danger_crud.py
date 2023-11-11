@@ -11,32 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from sqlalchemy.orm import Session
 
 from . import models, schema
 
-def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
-
-def get_user_by_name(db: Session, name: str):
-    return db.query(models.User).filter(models.User.name == name).first()
-
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).offset(skip).limit(limit).all()
-
-def create_user(db: Session, user: schema.UserCreate):
+def create_danger(db: Session, danger: schema.Danger):
 
     args = {
-        'name': user.name,
-        'password': user.password,
-        'address': user.address,
-        'call': user.call,
-        'age': user.age
+        'image': danger.image,
+        'time': danger.time,
+        'user_id': danger.user_id,
     }
 
-    db_user = models.User(**args)
-    db.add(db_user)
+    db_danger = models.Danger(**args)
+    db.add(db_danger)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_danger)
+    return db_danger
+
+def get_danger_by_id(db: Session, id: int):
+    return db.query(models.Danger).filter(models.Danger.user_id == id).first()
