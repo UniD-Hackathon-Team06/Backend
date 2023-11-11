@@ -72,6 +72,13 @@ def create_user(user: schema.UserCreate, db: Session = Depends(conn.getDB)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return user_crud.create_user(db=db, user=user)
 
+@app.post("/danger/user_id", response_model= schema.DangerBase)
+def alert_danger(danger: schema.Danger, db: Session = Depends(conn.getDB)):
+    db_danger = user_crud.get_danger_by_id(db, id=danger.user_id)
+    return user_crud.alert_danger(db=db, danger=danger)
+
+
+
 @app.get("/")
 async def root():
     return HTMLResponse(html)
