@@ -92,6 +92,26 @@ def create_user(user: schema.UserCreate, db: Session = Depends(conn.getDB)):
 def alert_danger(danger: schema.DangerCreate, db: Session = Depends(conn.getDB)):
     return danger_crud.create_danger(db=db, danger=danger)
 
+@app.get("/danger/{user_id}")
+def get_danger(user_id: str, db: Session = Depends(conn.getDB)):
+    db_danger = danger_crud.get_danger_by_id(db, id=int(user_id))
+    if db_danger is None:
+        raise HTTPException(status_code=404, detail="Danger not found")
+    return db_danger
+
+@app.get("/danger_alert")
+def alert_danger(db: Session = Depends(conn.getDB)):
+    db_danger = danger_crud.get_yet_dangers(db)
+
+    for danger in db_danger:
+        danger.done = True
+
+    db.commit()
+
+    for danger in db_danger:
+        db.refresh(danger)
+
+    return db_danger
 #login
 @app.post("/login")
 def login(user: schema.UserLogin, db: Session = Depends(conn.getDB)):

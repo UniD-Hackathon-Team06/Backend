@@ -24,6 +24,7 @@ class DangerCreate(DangerBase):
 
 class Danger(DangerBase):
     id: int
+    done: bool
 
     class Config:
         orm_mode = True

@@ -30,4 +30,7 @@ def create_danger(db: Session, danger: schema.Danger):
     return db_danger
 
 def get_danger_by_id(db: Session, id: int):
-    return db.query(models.Danger).filter(models.Danger.user_id == id).first()
+    return db.query(models.Danger).filter(models.Danger.user_id == id).all()
+
+def get_yet_dangers(db: Session):
+    return db.query(models.Danger).filter(models.Danger.done == False).all()

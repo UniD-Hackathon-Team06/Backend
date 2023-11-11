@@ -49,5 +49,6 @@ class Danger(connect.Base):
     image = Column(Text)
     user_id = Column(Integer, ForeignKey("user.id"))
     time = Column(String(128))
+    done = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="dangers")
