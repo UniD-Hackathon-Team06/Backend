@@ -14,15 +14,44 @@
 
 from pydantic import BaseModel
 
+class DangerBase(BaseModel):
+    image: str
+
+class DangerCreate(DangerBase):
+    pass
+
+class Danger(DangerBase):
+    id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
 class UserBase(BaseModel):
-    email: str
+    name: str
 
 class UserCreate(UserBase):
     password: str
+    address: str
+    call: str
+    age: int
 
 class User(UserBase):
     id: int
     is_active: bool
+    dangers: list[Danger] = []
+
+    class Config:
+        orm_mode = True
+
+class MessageBase(BaseModel):
+    message: str
+
+class MessageCreate(MessageBase):
+    pass
+
+class Message(MessageBase):
+    id: int
 
     class Config:
         orm_mode = True

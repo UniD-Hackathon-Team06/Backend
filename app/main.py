@@ -67,7 +67,7 @@ manager = ConnectionManager()
 
 @app.post("/users/", response_model=schema.User)
 def create_user(user: schema.UserCreate, db: Session = Depends(conn.getDB)):
-    db_user = user_crud.get_user_by_email(db, email=user.email)
+    db_user = user_crud.get_user_by_name(db, name=user.name)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     return user_crud.create_user(db=db, user=user)
