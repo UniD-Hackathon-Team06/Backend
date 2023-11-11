@@ -118,14 +118,12 @@ def read_protected_data(current_token: str = Depends(get_current_token), db: Ses
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 #message
-@app.get("/message/{message_id}")
-def set_message(message_id: str, db: Session = Depends(conn.getDB), ):
-    message_content = msg_crud.set_message(db=db, msg_id=int(message_id))
+@app.get("/message/{template_id}")
+def set_message(template_id: str, db: Session = Depends(conn.getDB)):
+    message_content = msg_crud.set_message_template(db=db, template_id=int(template_id))
     if message_content is None:
         raise HTTPException(status_code=404, detail="Message not found")
     return message_content
-
-
 
 #base test
 @app.get("/")

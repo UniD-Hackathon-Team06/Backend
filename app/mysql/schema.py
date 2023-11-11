@@ -48,13 +48,13 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
-class MessageBase(BaseModel):
-    message: str
+class MessageTemplateBase(BaseModel):
+    template: str
 
-class MessageCreate(MessageBase):
+class MessageTemplateCreate(MessageTemplateBase):
     pass
 
-class Message(MessageBase):
+class MessageTemplate(MessageTemplateBase):
     id: int
     activate: bool
 

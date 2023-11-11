@@ -29,12 +29,18 @@ class User(connect.Base):
 
     dangers = relationship("Danger", back_populates="user")
 
+class MessageTemplate(connect.Base):
+    __tablename__ = "message_template"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    template = Column(String(128))
+    activate = Column(Boolean, default=False)
+
 class Message(connect.Base):
     __tablename__ = "message"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     message = Column(String(128))
-    activate = Column(Boolean, default=False)
 
 class Danger(connect.Base):
     __tablename__ = "danger"

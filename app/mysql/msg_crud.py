@@ -16,12 +16,24 @@ from sqlalchemy.orm import Session
 
 from . import models, schema
 
-def set_message(db: Session, msg_id: int):
-    message_item = db.query(models.Message).filter(models.Message.id == msg_id).first()
+def set_message_template(db: Session, template_id: int):
+    item = db.query(models.MessageTemplate).filter(models.MessageTemplate.id == template_id).first()
 
-    if message_item is None:
+    if item is None:
         return None
 
-    message_item.activate = True
+    message = item.template
+    print(message)
+    item.activate = True
     db.commit()
-    return {"result": "success"}
+
+    args = {
+        'message': message
+    }
+
+    db_message = models.Message(**args)
+    db.add(db_message)
+    db.commit()
+    db.refresh(db_message)
+
+    return db_message
