@@ -109,9 +109,9 @@ def login(user: schema.UserLogin, db: Session = Depends(conn.getDB)):
 def read_protected_data(current_token: str = Depends(get_current_token), db: Session = Depends(conn.getDB)):
     try:
         name = current_token.split("_")[2]
-        print(name)
-        if user_crud.get_user_by_name(db, name=name):
-            return {"message": "This is protected data", "token": current_token}
+        user = user_crud.get_user_by_name(db, name=name)
+        if user:
+            return {"message": "This is protected data", "token": current_token, "user": user}
         else:
             raise HTTPException(status_code=401, detail="Unauthorized")
     except:
