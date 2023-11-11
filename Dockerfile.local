@@ -1,0 +1,20 @@
+FROM ubuntu:22.04
+
+# Install basic
+RUN apt-get update -y && \
+    apt-get install -y
+
+# Install Python 3.10
+RUN add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update -y && \
+    apt-get install -y \
+	python3.10 \
+	python3-pip
+
+COPY requirements.txt ./
+
+# Install pipenv
+RUN pip install -r requirements.txt
+
+# Setting server
+WORKDIR /app
