@@ -40,3 +40,6 @@ def set_message_template(db: Session, template_id: int):
 
 def get_active_message_template(db: Session):
     return db.query(models.MessageTemplate).filter(models.MessageTemplate.activate == True).first()
+
+def get_messages(db: Session):
+    return db.query(models.Message).all()

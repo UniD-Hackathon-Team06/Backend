@@ -140,6 +140,11 @@ def reply_message(reply: schema.Reply, current_token: str = Depends(get_current_
     except:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
+@app.get("/messages")
+def get_message(db: Session = Depends(conn.getDB)):
+    db_messages = msg_crud.get_messages(db)
+    return db_messages
+
 @app.get("/alert")
 def alert_no_reply(db: Session = Depends(conn.getDB)):
     db_users = user_crud.get_users(db)
