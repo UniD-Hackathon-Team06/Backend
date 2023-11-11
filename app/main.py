@@ -195,12 +195,13 @@ def alert_no_reply(db: Session = Depends(conn.getDB)):
 async def root():
     return HTMLResponse(html)
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            await websocket.send_bytes(f"Message text was: {data}")
+            await manager.broadcast(f"{data}")
     except WebSocketDisconnect:
-        print("disconnect")
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client #{client_id} left the chat")
