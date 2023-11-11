@@ -37,9 +37,12 @@ class UserCreate(UserBase):
     call: str
     age: int
 
+class UserLogin(UserBase):
+    password: str
+
 class User(UserBase):
     id: int
-    is_active: bool
+    reply: bool
     dangers: list[Danger] = []
 
     class Config:

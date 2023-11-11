@@ -26,7 +26,6 @@ class User(connect.Base):
     call = Column(String(32))
     age = Column(Integer)
     reply = Column(Boolean, default=False)
-    is_active = Column(Boolean, default=True)
 
     dangers = relationship("Danger", back_populates="user")
 

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordBearer
 
 from mysql import models, schema, connect, user_crud
 
@@ -44,6 +45,14 @@ html = """
 </html>
 """
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def get_current_token(token: str = Depends(oauth2_scheme)):
+    return token
+
+def create_token(username: str):
+    return "access_token_{}".format(username)
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
@@ -65,12 +74,41 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.post("/users/", response_model=schema.User)
+@app.get("/users")
+def get_users(db: Session = Depends(conn.getDB)):
+    db_users = user_crud.get_users(db)
+    return db_users
+
+@app.post("/users", response_model=schema.User)
 def create_user(user: schema.UserCreate, db: Session = Depends(conn.getDB)):
     db_user = user_crud.get_user_by_name(db, name=user.name)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     return user_crud.create_user(db=db, user=user)
+
+@app.post("/login")
+def login(user: schema.UserLogin, db: Session = Depends(conn.getDB)):
+    db_user = user_crud.get_user_by_name(db, name=user.name)
+    if db_user:
+        if db_user.password == user.password:
+            token = create_token(user.name)
+            return {"result": "success", "access_token": token}
+        else:
+            return {"result": "fail"}
+    else:
+        return {"result": "fail"}
+
+@app.get("/login/test")
+def read_protected_data(current_token: str = Depends(get_current_token), db: Session = Depends(conn.getDB)):
+    try:
+        name = current_token.split("_")[2]
+        print(name)
+        if user_crud.get_user_by_name(db, name=name):
+            return {"message": "This is protected data", "token": current_token}
+        else:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+    except:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 @app.get("/")
 async def root():
