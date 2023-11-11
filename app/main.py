@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 
-from mysql import models, schema, connect, user_crud, danger_crud
+from mysql import models, schema, connect, user_crud, danger_crud, msg_crud
 
 conn = connect.engineconn()
 
@@ -74,6 +74,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+#users
 @app.get("/users")
 def get_users(db: Session = Depends(conn.getDB)):
     db_users = user_crud.get_users(db)
@@ -86,10 +87,12 @@ def create_user(user: schema.UserCreate, db: Session = Depends(conn.getDB)):
         raise HTTPException(status_code=400, detail="user already registered")
     return user_crud.create_user(db=db, user=user)
 
+#dangers
 @app.post("/danger", response_model= schema.DangerBase)
 def alert_danger(danger: schema.DangerCreate, db: Session = Depends(conn.getDB)):
     return danger_crud.create_danger(db=db, danger=danger)
 
+#login
 @app.post("/login")
 def login(user: schema.UserLogin, db: Session = Depends(conn.getDB)):
     db_user = user_crud.get_user_by_name(db, name=user.name)
@@ -114,6 +117,17 @@ def read_protected_data(current_token: str = Depends(get_current_token), db: Ses
     except:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
+#message
+@app.get("/message/{message_id}")
+def set_message(message_id: str, db: Session = Depends(conn.getDB), ):
+    message_content = msg_crud.set_message(db=db, msg_id=int(message_id))
+    if message_content is None:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return message_content
+
+
+
+#base test
 @app.get("/")
 async def root():
     return HTMLResponse(html)
