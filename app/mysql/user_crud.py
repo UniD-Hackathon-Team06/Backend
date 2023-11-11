@@ -40,3 +40,20 @@ def create_user(db: Session, user: schema.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def alert_danger(db: Session, danger: schema.Danger):
+
+    args = {
+        'image': danger.image,
+        'time': danger.time,
+        'user_id': danger.user_id,
+    }
+
+    db_danger = models.Danger(**args)
+    db.add(db_danger)
+    db.commit()
+    db.refresh(db_danger)
+    return db_danger
+
+def get_danger_by_id(db: Session, id: int):
+    return db.query(models.danger).filter(models.dnager.user_id == id).first()
