@@ -130,15 +130,19 @@ def reply_message(reply: schema.Reply, current_token: str = Depends(get_current_
     try:
         name = current_token.split("_")[2]
         db_user = user_crud.get_user_by_name(db, name=name)
+        activated_message = msg_crud.get_active_message_template(db)
+
+        if activated_message is None:
+            raise HTTPException(status_code=400, detail="not send message yet")
         if db_user:
             db_user.reply = True
             db.commit()
             db.refresh(db_user)
             return {"result": "success"}
         else:
-            raise HTTPException(status_code=401, detail="Unauthorized")
+            raise HTTPException(status_code=401, detail="no user")
     except:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+        raise HTTPException(status_code=401, detail="not authorized or not sending message")
 
 @app.get("/messages")
 def get_message(db: Session = Depends(conn.getDB)):
